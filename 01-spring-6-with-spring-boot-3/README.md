@@ -181,3 +181,21 @@
 - IoC provides the mechanism of dependency injection, allowing a shift in object creation and management, compared to how it's done in a trditional java application.
 - `ApplicationContext` wraps the `BeanFactory` (which is ultimately the IoC container), which serves te beans to the runtime of the application.
 - Spring Boot provides auto-confuration of the `ApplicationContext` [of the `BeanFactory`] based on the presence/absence of classes, among other conditionals; thus greatly improving the speed of application development.
+
+### Introduction to Spring Boot
+
+The Benefits of Spring Boot:
+
+- Supports Rapid Development: Fully functional apps can be built w/ minimal effort.
+- Removes boilerplates of application setup of the Spring framework, and got abstracted through Auto Configuration.
+- Many modern application uses &mdash; even beyond webapps.
+  - The modern app use-cases include traditional and cloud-native application development.
+- Aut-configuration and embdded offerings like DBs, servlet containers, tomcat webserver, etc, speeds up the development process.
+
+#### Key Components of Spring Boot
+
+- Embedded Apache Tomcat (and others); we used to build WAR (web archive) files and run them in a web server like apache tomcat.
+- Auto-configuration of `ApplicationContext` removes the need to configure every single aspect of the running application. We used to spend a lot of time configuring, just to make a "Hello World!" type application run; we don't do that now.
+- Automatic Servlet Mapping: we used to map servlets to get the applications up and running in `web.xml` file (web descriptor file), and now, we do none of that.
+- Embedded database support and Hibernate/JPA dialect: no configuration is needed to setup databases, thanks to Auto Configuration feature of Spring Boot, based on the classes present on the classpath, the database and related ORMs are configured automatically.
+- Automatic Controller Mappings: allows you to serve web pages with no extra configuration.
