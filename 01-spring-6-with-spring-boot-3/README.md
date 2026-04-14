@@ -18,6 +18,11 @@
       - [Why is Spring Popular \& Widely Used?](#why-is-spring-popular--widely-used)
     - [Introduction to Spring Boot](#introduction-to-spring-boot)
       - [Key Components of Spring Boot](#key-components-of-spring-boot)
+    - [Create Spring Project](#create-spring-project)
+      - [Examine a Spring Boot Skeleton](#examine-a-spring-boot-skeleton)
+    - [Spring Boot Annotations](#spring-boot-annotations)
+      - [Details on Auto-configuration](#details-on-auto-configuration)
+      - [Details on Proxies](#details-on-proxies)
 
 ## Setting Up PostgreSQL using Docker
 
@@ -212,3 +217,62 @@ The Benefits of Spring Boot:
 - Automatic Controller Mappings: allows you to serve web pages with no extra configuration.
 
 [⬆️](#table-of-contents)
+
+### Create Spring Project
+
+1. Open <https://start.spring.io>, and set the following options:
+   1. Project: `Maven`
+   2. Language: `Java`
+   3. Spring Boot: `Latest` (`4.0.5` for this project)
+   4. Project Metadata:
+      1. Group: `com.<your-name>.lil`
+      2. Artifact: `landon-hotel`
+      3. Name: `landon-hotel`
+      4. Description: \<Empty> | \<Anything you prefer>
+      5. Packaging: `Jar`
+      6. Configuration: `Properties`
+      7. Java: `17`
+   5. Dependencies: `Spring Web` (There are other dependencies, which can be added later. In the real world, all the dependencies are added in the beginning itself).
+   6. Click `Generate`, and it'll generate a zip file with the `Artifact` you've mentioned. For example, if the details are as is as mentioned above, the zip file should be: `landon-hotel.zip`.
+
+#### Examine a Spring Boot Skeleton
+
+Open the zip file, and delete (OPTIONAL):
+
+1. `.mvn` directory (if maven is already installed, no need for this package).
+2. `mvnw` and `mvnw.cmd` command files (if maven is already installed, delete these).
+3. `.gitignore` and `HELP.md` files.
+4. Right Click on `src/main/resources/static` and create `index.html`, add HTML to it.
+5. Then click on eclipse/intellij Run button.
+6. Open <https://localhost:8080> to check the output: `Hello World!` [or whatever you've added in `index.html`].
+
+### Spring Boot Annotations
+
+- Spring Boot is driven by Auto-Configuration and Component Scanning, and **Annotations drive the component scanning**.
+- What are Annotations?
+  1. Native feature and support by Java.
+  2. Metadata for your code.
+  3. Often used for compiler or runtime instructions.
+  4. Great leverage point for pointcuts (Used in AOP: Aspect Oriented Programming)
+- How does Annotation aid Configuration?
+  1. **IoC Container is Driven by Configuration**.
+  2. XML Configuration: Spring used to be entirely configured using XML, while the support still exists, it has been deprecated by the community, and is almost entirely phased out in active development.
+  3. Java Configuration: replacement for the XML Configuration, where Beans are destined for the `BeanFactory` [which is the essential component of the IoC container] can be defined with functions annotated with `@Bean`. These beans can be served to any class in your application. The functions themselves are pure Java, and they exist in the `@SpringBoot` annotated class.
+  4. Component Scanning: easiest method of configuration today, through this method, annotations are added to classes, attributes, and methods that allow the framework to define a Bean for use in the application. Indeed, *Java Configuration*, is driven by Component Scanning of the annotated class and then the method(s) within it.
+  5. Auto-configuration: is an aspect of Spring Boot where beans are added to the `BeanFactory` (IoC Container) based on Annotations and Conditions. This is the power of Spring Boot, because it allows default Bean creation based on presence/absence of classes in the classpath, or already in the `BeanFactory` (IoC Container).
+
+#### Details on Auto-configuration
+
+- Bootstrapping an application with `@SpringBootApplication`, or annotating a config class with `@EnableAutoConfiguration` turns on Auto-configuration, once that class' component is scanned.
+- The IoC container configuration [through auto-configuration] is dependent entirely on the classes included on the classpath, via the dependency JARs included in the project, as well as conditions.
+- Can be customized &mdash; you've control over auto-config's behaviour, and hence you can turn off certain parts of the framework's behaviour around aut-config strategy. **Exclusions** provide the customized behaviour.
+- Driven by properties - Spring gives you common properties, to specific data points. These common properties give you exposure to the most common overrides, without actually having to override the auto-configuration behaviour itself.
+- Developer can configure everything - if the properties are not sufficient for the dev's needs, Spring's auto-configuration operations will stop trying to configure a Bean, if the dev has already defined it, in their configuration, or in components that are annotated.
+
+#### Details on Proxies
+
+- Outside of configuration, behaviour can be added to configured beans, specifically through the Proxy Pattern.
+- Beans in `BeanFactory` are proxied by Spring. Spring already adds various types of behaviour based on the class, and based on any annotations that are on it already.
+- Annotations drive proxies; 99% of the behaviour is defined by proxies through annotations, unless, the dev configures the behaviour via their proxy, without an annotation through the use of Aspecting.
+- Annotations are easy extension points.
+- Order of method calling matters! This is an important thing to note for Proxied code.
