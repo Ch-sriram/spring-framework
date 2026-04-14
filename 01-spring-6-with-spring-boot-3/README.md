@@ -151,3 +151,33 @@
      >       28 | Manchester  | M4          | 1K
      > (28 rows)
      > ```
+
+## Getting Started with Spring Boot
+
+- Contains details on Spring, Spring Boot, project Creation, Spring Boot Skeleton, and Annotations, etc.
+
+### Introduction to Spring
+
+- What is Spring?
+  - A Framework for providing infrastructural support for developing Java applications.
+  - The framework provides the plumbing and scaffolding, to ensure that devs can focus primarily on the business logic, instead of setting up things.
+    - It does this by relying on **Object Oriented Programming (OOP)** abstractions in the framework.
+    - And all of this is based on the **Don't Repeat Yourself (DRY)** Principle.
+
+#### Java & Spring Definitions
+
+1. POJO: Plain Old Java Object is a Java class in the purest sense. POJO contains both attributes and methods for working with the class.
+2. JavaBeans (from EJB): are simple objects/instances with only getters and setters for the attributes.
+3. **Spring Beans**: POJOs configured in the *application context* (application context will be explained later).
+4. Data Transfer Objects (DTOs): Javabeans used to move state between layers.
+
+#### Why is Spring Popular & Widely Used?
+
+- Well documented.
+- The framework builds its constructs based on Common patterns accross differing uses.
+- Configuration by annotation based - component scanning or Java (earlier, it used to be configured using XML): When SpringBoot is added, you get Auto Configuration as well, making configuration even easier.
+- **Inversion of Control (IoC)** is the primary focus of how the framework works. What we're actually configuring, is the IoC container, which is the most central part of a running Spring application.
+- IoC is one of the OOP patterns that Spring leverages to its core.
+- IoC provides the mechanism of dependency injection, allowing a shift in object creation and management, compared to how it's done in a trditional java application.
+- `ApplicationContext` wraps the `BeanFactory` (which is ultimately the IoC container), which serves te beans to the runtime of the application.
+- Spring Boot provides auto-confuration of the `ApplicationContext` [of the `BeanFactory`] based on the presence/absence of classes, among other conditionals; thus greatly improving the speed of application development.
