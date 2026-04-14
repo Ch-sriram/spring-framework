@@ -9,8 +9,15 @@
 ## Table of Contents
 
 - [Learning Spring 6 \& Spring Boot 3](#learning-spring-6--spring-boot-3)
+  - [Prerequisite Knowledge](#prerequisite-knowledge)
   - [Table of Contents](#table-of-contents)
   - [Setting Up PostgreSQL using Docker](#setting-up-postgresql-using-docker)
+  - [Getting Started with Spring Boot](#getting-started-with-spring-boot)
+    - [Introduction to Spring](#introduction-to-spring)
+      - [Java \& Spring Definitions](#java--spring-definitions)
+      - [Why is Spring Popular \& Widely Used?](#why-is-spring-popular--widely-used)
+    - [Introduction to Spring Boot](#introduction-to-spring-boot)
+      - [Key Components of Spring Boot](#key-components-of-spring-boot)
 
 ## Setting Up PostgreSQL using Docker
 
@@ -152,6 +159,8 @@
      > (28 rows)
      > ```
 
+[⬆️](#table-of-contents)
+
 ## Getting Started with Spring Boot
 
 - Contains details on Spring, Spring Boot, project Creation, Spring Boot Skeleton, and Annotations, etc.
@@ -182,6 +191,8 @@
 - `ApplicationContext` wraps the `BeanFactory` (which is ultimately the IoC container), which serves te beans to the runtime of the application.
 - Spring Boot provides auto-confuration of the `ApplicationContext` [of the `BeanFactory`] based on the presence/absence of classes, among other conditionals; thus greatly improving the speed of application development.
 
+[⬆️](#table-of-contents)
+
 ### Introduction to Spring Boot
 
 The Benefits of Spring Boot:
@@ -199,3 +210,5 @@ The Benefits of Spring Boot:
 - Automatic Servlet Mapping: we used to map servlets to get the applications up and running in `web.xml` file (web descriptor file), and now, we do none of that.
 - Embedded database support and Hibernate/JPA dialect: no configuration is needed to setup databases, thanks to Auto Configuration feature of Spring Boot, based on the classes present on the classpath, the database and related ORMs are configured automatically.
 - Automatic Controller Mappings: allows you to serve web pages with no extra configuration.
+
+[⬆️](#table-of-contents)
