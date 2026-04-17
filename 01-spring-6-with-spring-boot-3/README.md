@@ -235,6 +235,8 @@ The Benefits of Spring Boot:
    5. Dependencies: `Spring Web` (There are other dependencies, which can be added later. In the real world, all the dependencies are added in the beginning itself).
    6. Click `Generate`, and it'll generate a zip file with the `Artifact` you've mentioned. For example, if the details are as is as mentioned above, the zip file should be: `landon-hotel.zip`.
 
+[⬆️](#table-of-contents)
+
 #### Examine a Spring Boot Skeleton
 
 Open the zip file, and delete (OPTIONAL):
@@ -245,6 +247,8 @@ Open the zip file, and delete (OPTIONAL):
 4. Right Click on `src/main/resources/static` and create `index.html`, add HTML to it.
 5. Then click on eclipse/intellij Run button.
 6. Open <https://localhost:8080> to check the output: `Hello World!` [or whatever you've added in `index.html`].
+
+[⬆️](#table-of-contents)
 
 ### Spring Boot Annotations
 
@@ -261,6 +265,8 @@ Open the zip file, and delete (OPTIONAL):
   4. Component Scanning: easiest method of configuration today, through this method, annotations are added to classes, attributes, and methods that allow the framework to define a Bean for use in the application. Indeed, *Java Configuration*, is driven by Component Scanning of the annotated class and then the method(s) within it.
   5. Auto-configuration: is an aspect of Spring Boot where beans are added to the `BeanFactory` (IoC Container) based on Annotations and Conditions. This is the power of Spring Boot, because it allows default Bean creation based on presence/absence of classes in the classpath, or already in the `BeanFactory` (IoC Container).
 
+[⬆️](#table-of-contents)
+
 #### Details on Auto-configuration
 
 - Bootstrapping an application with `@SpringBootApplication`, or annotating a config class with `@EnableAutoConfiguration` turns on Auto-configuration, once that class' component is scanned.
@@ -269,6 +275,8 @@ Open the zip file, and delete (OPTIONAL):
 - Driven by properties - Spring gives you common properties, to specific data points. These common properties give you exposure to the most common overrides, without actually having to override the auto-configuration behaviour itself.
 - Developer can configure everything - if the properties are not sufficient for the dev's needs, Spring's auto-configuration operations will stop trying to configure a Bean, if the dev has already defined it, in their configuration, or in components that are annotated.
 
+[⬆️](#table-of-contents)
+
 #### Details on Proxies
 
 - Outside of configuration, behaviour can be added to configured beans, specifically through the Proxy Pattern.
@@ -276,3 +284,56 @@ Open the zip file, and delete (OPTIONAL):
 - Annotations drive proxies; 99% of the behaviour is defined by proxies through annotations, unless, the dev configures the behaviour via their proxy, without an annotation through the use of Aspecting.
 - Annotations are easy extension points.
 - Order of method calling matters! This is an important thing to note for Proxied code.
+
+[⬆️](#table-of-contents)
+
+## Data Access in Spring
+
+We'll take a look into the following concepts:
+
+1. Spring Data & Repositories
+2. Embedded DB in Spring Boot
+3. Using a Remote Database
+
+### Spring Data
+
+- With the Spring framework, there are a series of top-level projects that provide a robust set of implementations, and **Spring Data** is one such project that provides data access. Spring Data comes with the following out of the box:
+  1. **Provides a common set of interfaces** that can be used across many different data sources, from traditional RDMBS to NoSQL, and some database adjacent technologies like Redis, Memcached, and Search Engines.
+  2. **Provides a common naming convention**. Some patterns in Spring Data, like JDBC template follows a pattern across the entire platform. Others like Repository, are used across all of Spring Data; within the Repositories, naming is also at play when building dynamic queries based on method naming.
+  3. **Provides aspected behaviour** around transaction management, that can be used to build transactions that span single or multiple methods.
+  4. **Provides repository and data mapping convention** through either repository pattern with an ORM (JPA), or through data mappers when using JDBC template.
+
+[⬆️](#table-of-contents)
+
+#### Benefits of Spring Data
+
+1. **Removes boilerplate code**; if you're w/ ORMs, you can change many repetitive lines of code for a single method, into a simple interface definition at most. If you don't like ORMs and use JDBC templates, you still save a lot of repetitive code, on building the connection, committing, and then tearing down what has happened, for every database call.
+2. **Allows for ease of swapping data sources**; you can easily build POCs locally using a different database like `H2`, and then converting it to use Postgres [or whatever production database is in-use] with no real code changes.
+   - In addition, because of the similarities across the framework, switching from relational to NoSQL, is generally pretty clean and easy.
+3. **Allows you to focus on Business logic**: Pt. 1 & 2 combined [along with other benefits of the framework itself], allow you focus on your business logic, and not so much on the scaffolding or plumbing code [setup code], that has nothing to do with the business needs, and everything to do with just using the technology.
+
+[⬆️](#table-of-contents)
+
+#### Key Components of Spring Data
+
+1. **Repository Interface**: Gives an extension point for your own database objects utilizing the repository design pattern. This is by far the easiest way to get data, to and from a database of any programming language [or framework] out there, and this same pattern, is being mimicked in other frameworks both within the JVM, and external to it.
+2. **`JdbcTempalte`**: Gives you an easy way to execute raw JDBC queries w/o a lot of overhead, dealing with connections. This template pattern is used across Spring, but with databases, it gives you way to not use an ORM, but to get a huge benefit from reduction of repetitive code.
+3. **`Jakarta EE` Entity Object**: from the `JPA` specification, Spring uses it in the same way that you would use it with JPA, whether you are consuming a relational database or not.
+4. `DataSource`: is a Java construct that represents a unique connection pattern to a database. You can have multiple data sources, in a single Spring application, but it does require a little more effort, because of the bean rules around having a certain no. of items in the `BeanFactory` that implement a class.
+
+[⬆️](#table-of-contents)
+
+#### Repository Method Names
+
+Spring Data doesn't just provide a set of common methods with the Repository interface. It gives you dynamically generated queries.
+
+The interface method names follow a convention to create queries:
+
+- `findAllBy...` and then some value, and that value has to exist on the entity itself.
+- `findBy...`, which will get a single instance, again, based on that same pattern of the name, or being an attribute on the Entity.
+- `findBy...And...`, has the same idea as mentioned in `findAllBy` and `findBy`, but now you've multiple values coming in.
+  - `findBy...Or...` is also another variant of this use-case.
+
+NOTE: All of these strategies aforementioned, are very well documented in **[Spring's JPA &mdash; Repository Query Keywords Documentation.](https://docs.spring.io/spring-data/jpa/reference/repositories/query-keywords-reference.html)**.
+
+[⬆️](#table-of-contents)
