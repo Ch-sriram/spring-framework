@@ -28,6 +28,8 @@
       - [Benefits of Spring Data](#benefits-of-spring-data)
       - [Key Components of Spring Data](#key-components-of-spring-data)
       - [Repository Method Names](#repository-method-names)
+    - [Embedded Database with Spring](#embedded-database-with-spring)
+    - [Repositories with Spring Data](#repositories-with-spring-data)
 
 ## Setting Up PostgreSQL using Docker
 
@@ -414,3 +416,192 @@ Spring provides an easy way to use embedded databases, and Spring Boot makes it 
    ```
 
    You can see that the database is created, but until we actually add the schema and the data ourselves, it won't create a database/table, and only has allocated a default database in the Hikari Pool.
+
+[⬆️](#table-of-contents)
+
+### Repositories with Spring Data
+
+In our [`schema.sql`](./landon-hotel/src/main/resources/schema.sql), we want to create an Entity for the [`rooms`](./landon-hotel/src/main/resources/schema.sql#L1-L6) table, for that:
+
+1. In [`src/main/java/com/sriram/lil/landon_hotel`](./landon-hotel/src/main/java/com/sriram/lil/landon_hotel/), we're going to create a package called `data.entity`, and within that package, we'll create a new Java class called `Room`, and add the code as follows:
+
+   ```diff
+   diff --git a/01-spring-6-with-spring-boot-3/landon-hotel/src/main/java/com/sriram/lil/landon_hotel/data/entity/Room.java b/01-spring-6-with-spring-boot-3/landon-hotel/src/main/java/com/sriram/lil/landon_hotel/data/entity/Room.java
+   new file mode 100644
+   index 0000000..22c19e8
+   --- /dev/null
+   +++ b/01-spring-6-with-spring-boot-3/landon-hotel/src/main/java/com/sriram/lil/landon_hotel/data/entity/Room.java
+   @@ -0,0 +1,31 @@
+   +package com.sriram.lil.landon_hotel.data.entity;
+   +
+   +import jakarta.persistence.Column;
+   +import jakarta.persistence.Entity;
+   +import jakarta.persistence.GeneratedValue;
+   +import jakarta.persistence.GenerationType;
+   +import jakarta.persistence.Id;
+   +import jakarta.persistence.Table;
+   +import lombok.Data;
+   +import lombok.ToString;
+   +
+   +@Entity
+   +@Table(name="rooms") // the table is named as "rooms", and the class is named as "Room", since the table contains all rooms, and the class serves a Room object.
+   +@Data // Getter and Setter access for the data in this entity, defined by Lombok
+   +@ToString // Convenience by lombok
+   +public class Room {
+   +
+   + @Id
+   + @Column(name="room_id")
+   + @GeneratedValue(strategy = GenerationType.AUTO)
+   + private long id;
+   + 
+   + @Column(name="name")
+   + private String name;
+   + 
+   + @Column(name="room_number")
+   + private String roomNumber;
+   +
+   + @Column(name="bed_info")
+   + private String bedInfo;
+   +}
+   ```
+
+2. Add a repository for the Room object after creating a new package: `com.sriram.lil.landon_hotel.data.repository`, and add the following changes to `RoomRepository` file:
+
+   ```diff
+   diff --git a/01-spring-6-with-spring-boot-3/landon-hotel/src/main/java/com/sriram/lil/landon_hotel/data/repository/RoomRepository.java b/01-spring-6-with-spring-boot-3/landon-hotel/src/main/java/com/sriram/lil/landon_hotel/data/repository/RoomRepository.java
+   new file mode 100644
+   index 0000000..f697c65
+   --- /dev/null
+   +++ b/01-spring-6-with-spring-boot-3/landon-hotel/src/main/java/com/sriram/lil/landon_hotel/data/repository/RoomRepository.java
+   @@ -0,0 +1,37 @@
+   +package com.sriram.lil.landon_hotel.data.repository;
+   +
+   +import java.util.Optional;
+   +
+   +import org.springframework.data.jpa.repository.JpaRepository;
+   +
+   +import com.sriram.lil.landon_hotel.data.entity.Room;
+   +
+   +/**
+   + * The Room Repository extends the JPA Repository,
+   + * to which the Entity type, and the PK's ({@link Room}'s {@code id} variable's) type is sent.
+   + *
+   + * @author chandrabhatta.sriram
+   + */
+   +public interface RoomRepository extends JpaRepository<Room, Long> {
+   +
+   +  /**
+   +   * This declaration itself is good enough for using this repository's
+   +   * method, which is this method, to find the room, by room number.
+   +   * @param roomNumber
+   +   * @return
+   +   */
+   +  Optional<Room> findByRoomNumberIgnoreCase(String roomNumber);
+   +  
+   +  /**
+   +   * From the entity {@link Room} itself, imagine what other methods can
+   +   * be created.
+   +   * 
+   +   * Some questions to ask:
+   +   * 1. How would you get all rooms with 2 queen size beds? OR
+   +   * 2. All the rooms of a certain name?
+   +   * 
+   +   * This would give us a way on how to create these methods, and they
+   +   * internally, dynamically [automatically] create the required
+   +   * query, w/o your intervention. This is really powerful.
+   +   */
+   +}
+   ```
+
+3. And then add a new `CLRunner.java` class in the root package [inside `com.sriram.lil.landon_hotel`], with the following code:
+
+   ```diff
+   diff --git a/01-spring-6-with-spring-boot-3/landon-hotel/src/main/java/com/sriram/lil/landon_hotel/CLRunner.java b/01-spring-6-with-spring-boot-3/landon-hotel/src/main/java/com/sriram/lil/landon_hotel/CLRunner.java
+   new file mode 100644
+   index 0000000..3fa03bf
+   --- /dev/null
+   +++ b/01-spring-6-with-spring-boot-3/landon-hotel/src/main/java/com/sriram/lil/landon_hotel/CLRunner.java
+   @@ -0,0 +1,76 @@
+   +package com.sriram.lil.landon_hotel;
+   +
+   +import java.util.List;
+   +import java.util.Optional;
+   +
+   +import org.springframework.boot.CommandLineRunner;
+   +import org.springframework.stereotype.Component;
+   +
+   +import com.sriram.lil.landon_hotel.data.entity.Room;
+   +import com.sriram.lil.landon_hotel.data.repository.RoomRepository;
+   +
+   +@Component
+   +public class CLRunner implements CommandLineRunner {
+   +
+   +  private final RoomRepository roomRepository;
+   +
+   +  /**
+   +   * This does an injection from the Spring's IoC container,
+   +   * and that means that Spring would need to have the
+   +   * {@link RoomRepository} object configured in it's IoC container.
+   +   * @param roomRepository
+   +   */
+   +  public CLRunner(RoomRepository roomRepository) {
+   +    this.roomRepository = roomRepository;
+   +  }
+   +
+   +  /**
+   +   * Check the Room related data in {@link data.sql}
+   +   */
+   +  @Override
+   +  public void run(String... args) throws Exception {
+   +    List<Room> rooms = roomRepository.findAll();
+   +    
+   +    // Since it's ignore case, make use of "p1", instead of "P1", since the table values of room number are all capital.
+   +    Optional<Room> room = roomRepository.findByRoomNumberIgnoreCase("p1");
+   +
+   +    System.out.println(room);
+   +
+   +    rooms.forEach(System.out::println);
+   +  }
+   +  
+   +  /**
+   +   * O/P:
+   +   * 
+   +   * Optional[Room(id=1, name=Piccadilly, roomNumber=P1, bedInfo=1Q)]
+   +   * Room(id=1, name=Piccadilly, roomNumber=P1, bedInfo=1Q)
+   +   * Room(id=2, name=Piccadilly, roomNumber=P2, bedInfo=1Q)
+   +   * Room(id=3, name=Piccadilly, roomNumber=P3, bedInfo=1Q)
+   +   * Room(id=4, name=Piccadilly, roomNumber=P4, bedInfo=2D)
+   +   * Room(id=5, name=Piccadilly, roomNumber=P5, bedInfo=2D)
+   +   * Room(id=6, name=Piccadilly, roomNumber=P6, bedInfo=2D)
+   +   * Room(id=7, name=Cambridge, roomNumber=C1, bedInfo=1K)
+   +   * Room(id=8, name=Cambridge, roomNumber=C2, bedInfo=1K)
+   +   * Room(id=9, name=Cambridge, roomNumber=C3, bedInfo=1K)
+   +   * Room(id=10, name=Westminster, roomNumber=W1, bedInfo=1K)
+   +   * Room(id=11, name=Westminster, roomNumber=W2, bedInfo=1K)
+   +   * Room(id=12, name=Westminster, roomNumber=W3, bedInfo=1K)
+   +   * Room(id=13, name=Westminster, roomNumber=W4, bedInfo=1K)
+   +   * Room(id=14, name=Westminster, roomNumber=W5, bedInfo=2D)
+   +   * Room(id=15, name=Westminster, roomNumber=W6, bedInfo=2D)
+   +   * Room(id=16, name=Westminster, roomNumber=W7, bedInfo=2D)
+   +   * Room(id=17, name=Oxford, roomNumber=O1, bedInfo=1K)
+   +   * Room(id=18, name=Oxford, roomNumber=O2, bedInfo=1K)
+   +   * Room(id=19, name=Oxford, roomNumber=O3, bedInfo=1Q)
+   +   * Room(id=20, name=Oxford, roomNumber=O4, bedInfo=1Q)
+   +   * Room(id=21, name=Oxford, roomNumber=O5, bedInfo=1Q)
+   +   * Room(id=22, name=Victoria, roomNumber=V1, bedInfo=1K)
+   +   * Room(id=23, name=Victoria, roomNumber=V2, bedInfo=2D)
+   +   * Room(id=24, name=Victoria, roomNumber=V3, bedInfo=2D)
+   +   * Room(id=25, name=Manchester, roomNumber=M1, bedInfo=1K)
+   +   * Room(id=26, name=Manchester, roomNumber=M2, bedInfo=1K)
+   +   * Room(id=27, name=Manchester, roomNumber=M3, bedInfo=1K)
+   +   * Room(id=28, name=Manchester, roomNumber=M4, bedInfo=1K)
+   +   */
+   +
+   +}
+   ```
+
+   NOTE: Use [this interaction in ChatGPT](https://chatgpt.com/share/69e2215e-1dd8-83e8-8fb1-378f63be10a3) to install `lombok.jar` correctly in Eclipse.
+
+4. Run [`CLRunner.java`](./landon-hotel/src/main/java/com/sriram/lil/landon_hotel/CLRunner.java) application, to see the output. If you see the output, you'll notice that there was literally no setup done for the Postgres database connection. Everything just went through and happened without any issues. That just came from the embedded database. 🔥🔥🔥
+
+[⬆️](#table-of-contents)
