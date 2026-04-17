@@ -23,6 +23,11 @@
     - [Spring Boot Annotations](#spring-boot-annotations)
       - [Details on Auto-configuration](#details-on-auto-configuration)
       - [Details on Proxies](#details-on-proxies)
+  - [Data Access in Spring](#data-access-in-spring)
+    - [Spring Data](#spring-data)
+      - [Benefits of Spring Data](#benefits-of-spring-data)
+      - [Key Components of Spring Data](#key-components-of-spring-data)
+      - [Repository Method Names](#repository-method-names)
 
 ## Setting Up PostgreSQL using Docker
 
