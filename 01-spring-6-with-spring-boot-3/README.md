@@ -342,3 +342,75 @@ The interface method names follow a convention to create queries:
 NOTE: All of these strategies aforementioned, are very well documented in **[Spring's JPA &mdash; Repository Query Keywords Documentation.](https://docs.spring.io/spring-data/jpa/reference/repositories/query-keywords-reference.html)**.
 
 [⬆️](#table-of-contents)
+
+### Embedded Database with Spring
+
+Spring provides an easy way to use embedded databases, and Spring Boot makes it even easier by auto-configuring not only the database, but leveraging a convention-based approach to apply schema and data to that database.
+
+1. Make changes in your [pom.xml](./landon-hotel/pom.xml) as follows:
+
+   ```diff
+   diff --git a/01-spring-6-with-spring-boot-3/landon-hotel/pom.xml b/01-spring-6-with-spring-boot-3/landon-hotel/pom.xml
+   index 121e993..06f5e30 100644
+   --- a/01-spring-6-with-spring-boot-3/landon-hotel/pom.xml
+   +++ b/01-spring-6-with-spring-boot-3/landon-hotel/pom.xml
+   @@ -40,6 +40,24 @@
+         <artifactId>spring-boot-starter-webmvc-test</artifactId>
+         <scope>test</scope>
+       </dependency>
+   +   
+   +   <!-- Source: https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-data-jpa -->
+   +   <dependency>
+   +       <groupId>org.springframework.boot</groupId>
+   +       <artifactId>spring-boot-starter-data-jpa</artifactId>
+   +   </dependency>
+   +   
+   +   <!-- Source: https://mvnrepository.com/artifact/com.h2database/h2 -->
+   +   <dependency>
+   +       <groupId>com.h2database</groupId>
+   +       <artifactId>h2</artifactId>
+   +   </dependency>
+   +   
+   +   <!-- Source: https://mvnrepository.com/artifact/org.projectlombok/lombok -->
+   +   <dependency>
+   +       <groupId>org.projectlombok</groupId>
+   +       <artifactId>lombok</artifactId>
+   +   </dependency>
+     </dependencies>
+    
+     <build>
+   ```
+
+2. Paste the files [`data.sql`](./course-exercise-files/00_03_begin/bin/h2/data.sql) and [`schema.sql`](./course-exercise-files/00_03_begin/bin/h2/schema.sql) into [`src/main/resources`](./landon-hotel/src/main/resources/).
+3. Open [`application.properties`](./landon-hotel/src/main/resources/application.properties) and make the following changes:
+
+   ```diff
+   diff --git a/01-spring-6-with-spring-boot-3/landon-hotel/src/main/resources/application.properties b/01-spring-6-with-spring-boot-3/landon-hotel/src/main/resources/application.properties
+   index 0d96d8d..0882937 100644
+   --- a/01-spring-6-with-spring-boot-3/landon-hotel/src/main/resources/application.properties
+   +++ b/01-spring-6-with-spring-boot-3/landon-hotel/src/main/resources/application.properties
+   @@ -1 +1,2 @@
+    spring.application.name=landon-hotel
+   +spring.jpa.hibernate.ddl-auto=none
+   \ No newline at end of file
+   ```
+
+   Why are we adding this property?
+
+   > When we start our application, it will run the schema file and then the data file [by convention of the name for databases in Spring, and it'll run in the order of Schema -> Data...], and it'll apply that schema to the embedded database.
+   > But putting in the `spring.jpa.hibernate.ddl-auto` property's value to `none`, we're letting `hibernate` know to NOT create the schema on our behalf, we'll handle it manually.
+
+4. Start the application now, and check something peculiar in the logs:
+
+   ```terminal
+   ...
+   2026-04-17T16:19:31.942+05:30  INFO 868888 --- [landon-hotel] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+   2026-04-17T16:19:32.045+05:30  INFO 868888 --- [landon-hotel] [           main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection conn0: url=jdbc:h2:mem:ce0a6344-232a-45ca-b87e-6ab10b813162 user=SA
+   2026-04-17T16:19:32.046+05:30  INFO 868888 --- [landon-hotel] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+   2026-04-17T16:19:32.180+05:30  INFO 868888 --- [landon-hotel] [           main] org.hibernate.orm.jpa                    : HHH008540: Processing PersistenceUnitInfo [name: default]
+   2026-04-17T16:19:32.237+05:30  INFO 868888 --- [landon-hotel] [           main] org.hibernate.orm.core                   : HHH000001: Hibernate ORM core version 7.2.7.Final
+   2026-04-17T16:19:32.476+05:30  INFO 868888 --- [landon-hotel] [           main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+   ...
+   ```
+
+   You can see that the database is created, but until we actually add the schema and the data ourselves, it won't create a database/table, and only has allocated a default database in the Hikari Pool.
