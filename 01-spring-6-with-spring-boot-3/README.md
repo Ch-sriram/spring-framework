@@ -749,3 +749,13 @@ To connect with the database (remote/local), do the following:
    > As you can see, the output is pretty much the same, we just changed the database, by removing the embedded database (H2 - which doesn't persist data on any CRUD operations, and only takes the data from the provided schema and data files; best for testing), and a real database like `postgresql`, gets the data from the actual database, and data gets persisted on any CRUD operations on the
 
 [⬆️](#table-of-contents)
+
+### Challenge
+
+1. Create entity for Guest table.
+2. Create entity for Reservation table.
+3. Create JPA repository for Guest table.
+4. Create JPA repository for Reservation table.
+   - Add method for Reservation repository to Get All By Column `RES_DATE`.
+
+[⬆️](#table-of-contents)
