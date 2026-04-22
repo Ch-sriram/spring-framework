@@ -31,6 +31,12 @@
     - [Embedded Database with Spring](#embedded-database-with-spring)
     - [Repositories with Spring Data](#repositories-with-spring-data)
     - [Using a Remote Database](#using-a-remote-database)
+    - [Challenge](#challenge)
+  - [Service Tier](#service-tier)
+    - [Understanding Dependency Injection](#understanding-dependency-injection)
+      - [Why Use IoC?](#why-use-ioc)
+      - [Spring and IoC](#spring-and-ioc)
+      - [Visualizing IoC](#visualizing-ioc)
 
 ## Setting Up PostgreSQL using Docker
 
@@ -757,5 +763,45 @@ To connect with the database (remote/local), do the following:
 3. Create JPA repository for Guest table.
 4. Create JPA repository for Reservation table.
    - Add method for Reservation repository to Get All By Column `RES_DATE`.
+
+[⬆️](#table-of-contents)
+
+## Service Tier
+
+In this section, we'll take a look into:
+
+1. Dependency Injection & Inversion of Control
+2. Building a Service Abstraction
+3. Developing a Service Object w/ Spring
+
+[⬆️](#table-of-contents)
+
+### Understanding Dependency Injection
+
+> Inversion of Control is a central theme for Spring, and here, we're going to discuss this Dependency Injection pattern, and see how it works.
+
+#### Why Use IoC?
+
+- **Allows you to focus on contracts** &mdash; dev's focus is on the implementation (the business logic) via the interface (contract), rather than setting up the contracts for already popular setups.
+- **Develops business code only, leave construction to the container** &mdash; this speeds up the development time, and ensures the construction and setup to the framework, instead of the developer.
+- **Build Intermediate Abstractions** &mdash; you might need to build intermediate abstractions in your code to handle aggregation logic. By leveraging IoC, you focus on the business needs of these abstractions, and not the cascading of construction that has to happen when you manage all of those in code, sometimes across multiple levels.
+- **Produce Clean Code** &mdash; Ensures cleaner and maintanable code, since you're now not responsible for setting up and maintaining configuration code.
+
+#### Spring and IoC
+
+- The IoC container is configured by the developer. With Spring Boot, much of this configuration is based on dependencies brought onto the classpath.
+- Spring maintains the handles to objects constructed at startup [these objects are in the `BeanFactory`].
+- Spring serves Singletons to classes during construction [or via Setter Injection] &mdash; usually, you use construction injection when its required, setter injection when its optional [or when there's multiple potential values], and you should never use field-level injection in production code [it's fine to use it in test, but never in production].
+- Spring maintains the lifecyle of these classes, called Beans in the Spring Framework.
+- The developer only accesses the application context [which is the wrapper for the `BeanFactory`], and many times, we don't even deal with the `ApplicationContext`, we just let the container handle it. In Spring, `ApplicationContext` was manually dealth with, w.r.t to Beans and context, but all of that is now gone with Spring Boot.
+
+#### Visualizing IoC
+
+- IoC starts up when your application starts up, in this case when the main method is called and the Spring Boot runner is executed.
+- The IoC container goes through a process determininng which classes it needs to scan, and which classes it needs to bring in to the `BeanFactory`, and it also, during this process, determines the order in which it has to construct these items/objects, and it then goes ahead and constructs these items [there's a lot of details about the construction of the class instances and scanning of classes, those details are covered in a separate course]
+- So, the IoC container itself not only manages the order of construction, but it ensures that all of those beans are constructed appropriately, the injections are handled appropriately, and it will fail if there are circular dependencies.
+- So when the IoC container knows that class A is consumed by class B, the IoC container will construct class A first, then class B, and inject class A in to class B during construction [assuming, constructor level injection is being used].
+
+![ioc-container-working-classes-a-b-c-dependency-chain-resolution](./images/ioc-container-working.png)
 
 [⬆️](#table-of-contents)
