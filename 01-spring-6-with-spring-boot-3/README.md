@@ -30,6 +30,7 @@
       - [Repository Method Names](#repository-method-names)
     - [Embedded Database with Spring](#embedded-database-with-spring)
     - [Repositories with Spring Data](#repositories-with-spring-data)
+    - [Using a Remote Database](#using-a-remote-database)
 
 ## Setting Up PostgreSQL using Docker
 
@@ -603,5 +604,148 @@ In our [`schema.sql`](./landon-hotel/src/main/resources/schema.sql), we want to 
    NOTE: Use [this interaction in ChatGPT](https://chatgpt.com/share/69e2215e-1dd8-83e8-8fb1-378f63be10a3) to install `lombok.jar` correctly in Eclipse.
 
 4. Run [`CLRunner.java`](./landon-hotel/src/main/java/com/sriram/lil/landon_hotel/CLRunner.java) application, to see the output. If you see the output, you'll notice that there was literally no setup done for the Postgres database connection. Everything just went through and happened without any issues. That just came from the embedded database. 🔥🔥🔥
+
+[⬆️](#table-of-contents)
+
+### Using a Remote Database
+
+In the real world, the database might not be located in the same machine as where your code is running from.
+
+In our case, the Postgres database, although it's hosted locally, the domain in our case is `localhost`, and therefore, it can be used with just `localhost`. The only difference is to change the `localhost` to a public domain name/IP.
+
+To connect with the database (remote/local), do the following:
+
+1. Replace H2 database with PostgreSQL maven dependency in [`pom.xml`](./landon-hotel/pom.xml#L50-L54):
+
+   ```diff
+   diff --git a/01-spring-6-with-spring-boot-3/landon-hotel/pom.xml b/01-spring-6-with-spring-boot-3/landon-hotel/pom.xml
+   index 06f5e30..0b2bb1f 100644
+   --- a/01-spring-6-with-spring-boot-3/landon-hotel/pom.xml
+   +++ b/01-spring-6-with-spring-boot-3/landon-hotel/pom.xml
+   @@ -46,13 +46,13 @@
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-jpa</artifactId>
+        </dependency>
+   -    
+   -    <!-- Source: https://mvnrepository.com/artifact/com.h2database/h2 -->
+   +
+   +    <!-- Source: https://mvnrepository.com/artifact/org.postgresql/postgresql -->
+        <dependency>
+   -        <groupId>com.h2database</groupId>
+   -        <artifactId>h2</artifactId>
+   +        <groupId>org.postgresql</groupId>
+   +        <artifactId>postgresql</artifactId>
+        </dependency>
+   -    
+   +
+        <!-- Source: https://mvnrepository.com/artifact/org.projectlombok/lombok -->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+   
+   ```
+
+2. Then in [`application.properties`](./landon-hotel/src/main/resources/application.properties), make the following changes:
+
+   ```diff
+   diff --git a/01-spring-6-with-spring-boot-3/landon-hotel/src/main/resources/application.properties b/01-spring-6-with-spring-boot-3/landon-hotel/src/main/resources/application.properties
+   index 0882937..daeb977 100644
+   --- a/01-spring-6-with-spring-boot-3/landon-hotel/src/main/resources/application.properties
+   +++ b/01-spring-6-with-spring-boot-3/landon-hotel/src/main/resources/application.properties
+   @@ -1,2 +1,6 @@
+    spring.application.name=landon-hotel
+   -spring.jpa.hibernate.ddl-auto=none
+   \ No newline at end of file
+   +spring.jpa.hibernate.ddl-auto=none
+   +spring.jpa.database=postgresql
+   +spring.datasource.url=jdbc:postgresql://localhost:5432/local?currentSchema=LIL
+   +spring.datasource.username=postgres
+   +spring.datasource.password=postgres
+   ```
+
+   Property Explaination:
+   1. `spring.jpa.datasource` - can be configured to any database of choice
+   2. `spring.datasource.url` - in our case, it's configured via jdbc drive, to a postgresql docker instance running in our localhost, under the database `local`, and the schema is `LIL`.
+   3. `spring.datasource.username` - this is set to the username that's connecting to the database.
+   4. `spring.datasource.password` - password of the connecting used for the database.
+
+3. Delete the files [`schema.sql`](https://github.com/Ch-sriram/spring-framework/blob/8a2ba35d46237db5efbfb58beb8cc01391ff9a20/01-spring-6-with-spring-boot-3/landon-hotel/src/main/resources/schema.sql) & [`data.sql`](https://github.com/Ch-sriram/spring-framework/blob/8a2ba35d46237db5efbfb58beb8cc01391ff9a20/01-spring-6-with-spring-boot-3/landon-hotel/src/main/resources/data.sql), and then run the application, and you should see the following as your output:
+
+   ```console
+   
+     .   ____          _            __ _ _
+    /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+   ( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+    \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+     '  |____| .__|_| |_|_| |_\__, | / / / /
+    =========|_|==============|___/=/_/_/_/
+   
+    :: Spring Boot ::                (v4.0.5)
+   
+   2026-04-17T18:20:05.727+05:30  INFO 927047 --- [landon-hotel] [           main] c.s.l.l.LandonHotelApplication           : Starting LandonHotelApplication using Java 21.0.10 with PID 927047 (/home/chandrabhatta.sriram/Documents/repos/personal/spring-framework/01-spring-6-with-spring-boot-3/landon-hotel/target/classes started by chandrabhatta.sriram in /home/chandrabhatta.sriram/Documents/repos/personal/spring-framework/01-spring-6-with-spring-boot-3/landon-hotel)
+   2026-04-17T18:20:05.732+05:30  INFO 927047 --- [landon-hotel] [           main] c.s.l.l.LandonHotelApplication           : No active profile set, falling back to 1 default profile: "default"
+   2026-04-17T18:20:06.663+05:30  INFO 927047 --- [landon-hotel] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+   2026-04-17T18:20:06.750+05:30  INFO 927047 --- [landon-hotel] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 71 ms. Found 1 JPA repository interface.
+   2026-04-17T18:20:07.527+05:30  INFO 927047 --- [landon-hotel] [           main] o.s.boot.tomcat.TomcatWebServer          : Tomcat initialized with port 8080 (http)
+   2026-04-17T18:20:07.576+05:30  INFO 927047 --- [landon-hotel] [           main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+   2026-04-17T18:20:07.577+05:30  INFO 927047 --- [landon-hotel] [           main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/11.0.20]
+   2026-04-17T18:20:07.674+05:30  INFO 927047 --- [landon-hotel] [           main] b.w.c.s.WebApplicationContextInitializer : Root WebApplicationContext: initialization completed in 1861 ms
+   2026-04-17T18:20:08.004+05:30  INFO 927047 --- [landon-hotel] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+   2026-04-17T18:20:08.255+05:30  INFO 927047 --- [landon-hotel] [           main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@1536ea40
+   2026-04-17T18:20:08.257+05:30  INFO 927047 --- [landon-hotel] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+   2026-04-17T18:20:08.338+05:30  INFO 927047 --- [landon-hotel] [           main] org.hibernate.orm.jpa                    : HHH008540: Processing PersistenceUnitInfo [name: default]
+   2026-04-17T18:20:08.402+05:30  INFO 927047 --- [landon-hotel] [           main] org.hibernate.orm.core                   : HHH000001: Hibernate ORM core version 7.2.7.Final
+   2026-04-17T18:20:09.141+05:30  INFO 927047 --- [landon-hotel] [           main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+   2026-04-17T18:20:09.222+05:30  WARN 927047 --- [landon-hotel] [           main] org.hibernate.orm.deprecation            : HHH90000025: PostgreSQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+   2026-04-17T18:20:09.259+05:30  INFO 927047 --- [landon-hotel] [           main] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+     Database JDBC URL [jdbc:postgresql://localhost:5432/local?currentSchema=LIL]
+     Database driver: PostgreSQL JDBC Driver
+     Database dialect: PostgreSQLDialect
+     Database version: 18.3
+     Default catalog/schema: local/lil
+     Autocommit mode: undefined/unknown
+     Isolation level: READ_COMMITTED [default READ_COMMITTED]
+     JDBC fetch size: none
+     Pool: DataSourceConnectionProvider
+     Minimum pool size: undefined/unknown
+     Maximum pool size: undefined/unknown
+   2026-04-17T18:20:10.188+05:30  INFO 927047 --- [landon-hotel] [           main] org.hibernate.orm.core                   : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+   2026-04-17T18:20:10.195+05:30  INFO 927047 --- [landon-hotel] [           main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+   2026-04-17T18:20:10.263+05:30  INFO 927047 --- [landon-hotel] [           main] o.s.d.j.r.query.QueryEnhancerFactories   : Hibernate is in classpath; If applicable, HQL parser will be used.
+   2026-04-17T18:20:10.459+05:30  WARN 927047 --- [landon-hotel] [           main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+   2026-04-17T18:20:10.486+05:30  INFO 927047 --- [landon-hotel] [           main] o.s.b.w.a.WelcomePageHandlerMapping      : Adding welcome page: class path resource [static/index.html]
+   2026-04-17T18:20:10.954+05:30  INFO 927047 --- [landon-hotel] [           main] o.s.boot.tomcat.TomcatWebServer          : Tomcat started on port 8080 (http) with context path '/'
+   2026-04-17T18:20:10.964+05:30  INFO 927047 --- [landon-hotel] [           main] c.s.l.l.LandonHotelApplication           : Started LandonHotelApplication in 5.736 seconds (process running for 6.106)
+   Optional[Room(id=1, name=Piccadilly, roomNumber=P1, bedInfo=1Q)]
+   Room(id=1, name=Piccadilly, roomNumber=P1, bedInfo=1Q)
+   Room(id=2, name=Piccadilly, roomNumber=P2, bedInfo=1Q)
+   Room(id=3, name=Piccadilly, roomNumber=P3, bedInfo=1Q)
+   Room(id=4, name=Piccadilly, roomNumber=P4, bedInfo=2D)
+   Room(id=5, name=Piccadilly, roomNumber=P5, bedInfo=2D)
+   Room(id=6, name=Piccadilly, roomNumber=P6, bedInfo=2D)
+   Room(id=7, name=Cambridge, roomNumber=C1, bedInfo=1K)
+   Room(id=8, name=Cambridge, roomNumber=C2, bedInfo=1K)
+   Room(id=9, name=Cambridge, roomNumber=C3, bedInfo=1K)
+   Room(id=10, name=Westminster, roomNumber=W1, bedInfo=1K)
+   Room(id=11, name=Westminster, roomNumber=W2, bedInfo=1K)
+   Room(id=12, name=Westminster, roomNumber=W3, bedInfo=1K)
+   Room(id=13, name=Westminster, roomNumber=W4, bedInfo=1K)
+   Room(id=14, name=Westminster, roomNumber=W5, bedInfo=2D)
+   Room(id=15, name=Westminster, roomNumber=W6, bedInfo=2D)
+   Room(id=16, name=Westminster, roomNumber=W7, bedInfo=2D)
+   Room(id=17, name=Oxford, roomNumber=O1, bedInfo=1K)
+   Room(id=18, name=Oxford, roomNumber=O2, bedInfo=1K)
+   Room(id=19, name=Oxford, roomNumber=O3, bedInfo=1Q)
+   Room(id=20, name=Oxford, roomNumber=O4, bedInfo=1Q)
+   Room(id=21, name=Oxford, roomNumber=O5, bedInfo=1Q)
+   Room(id=22, name=Victoria, roomNumber=V1, bedInfo=1K)
+   Room(id=23, name=Victoria, roomNumber=V2, bedInfo=2D)
+   Room(id=24, name=Victoria, roomNumber=V3, bedInfo=2D)
+   Room(id=25, name=Manchester, roomNumber=M1, bedInfo=1K)
+   Room(id=26, name=Manchester, roomNumber=M2, bedInfo=1K)
+   Room(id=27, name=Manchester, roomNumber=M3, bedInfo=1K)
+   Room(id=28, name=Manchester, roomNumber=M4, bedInfo=1K)
+   ```
+
+   > As you can see, the output is pretty much the same, we just changed the database, by removing the embedded database (H2 - which doesn't persist data on any CRUD operations, and only takes the data from the provided schema and data files; best for testing), and a real database like `postgresql`, gets the data from the actual database, and data gets persisted on any CRUD operations on the
 
 [⬆️](#table-of-contents)
