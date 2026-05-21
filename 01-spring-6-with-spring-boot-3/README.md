@@ -37,6 +37,9 @@
       - [Why Use IoC?](#why-use-ioc)
       - [Spring and IoC](#spring-and-ioc)
       - [Visualizing IoC](#visualizing-ioc)
+    - [Build a Service Abstraction](#build-a-service-abstraction)
+      - [Why Build Service Abstractions?](#why-build-service-abstractions)
+      - [Typical Steps to Build Services](#typical-steps-to-build-services)
 
 ## Setting Up PostgreSQL using Docker
 
@@ -805,3 +808,25 @@ In this section, we'll take a look into:
 ![ioc-container-working-classes-a-b-c-dependency-chain-resolution](./images/ioc-container-working.png)
 
 [⬆️](#table-of-contents)
+
+### Build a Service Abstraction
+
+- It's tempting to have as much lesser amount of code as possible for getting the backend data that's stored in your databases, through the repositories, and give direct access to them via some form of a web interface like a controller, or a web applcation. But there are many instances where a service abstraction is required.
+
+#### Why Build Service Abstractions?
+
+1. Encapsulate Layers: Hides lower layers of code. It helps to hide lower layers of code, and often times, helps NOT consuming the lower layers of code directly. Instead, an encapsulated layer, like a Service abstraction can be used. This good for business continuity, and general maintenance of code.
+2. Abstract 3rd Part APIs: When consuming 3rd party APIs, you can make use of encapsulation and isolate some of the changes made by that 3rd party APIs into what you want, and require from that 3rd party API. In most of the projects in production, the 3rd party APIs are seldomly called directly, they're often always wrapped inside some service layer using encapsulation.
+3. Simplify Complex Implementations: Often there's complex code that might just be useful for other APIs/teams/entities to be consumed, and that's where a service layer is beneficial to be created, so that the service can be reused everywhere.
+4. Swap Out Implementations at Runtime: Service abstractions also give you a way [via isolation] to swap out implementations at runtime, hiding your factory behind the service abstraction not only simplifies the implementation, but gives you a lot of power to swap out as needed without impacting code.
+
+#### Typical Steps to Build Services
+
+1. Define the interface (or class): A stub would be useful.
+2. Create the API: stub the implementation with default or dummy data to be able to write unit tests.
+3. Inject the Dependencies: setting up the dependencies in the constructor should be done in this step.
+4. Annotate or Configure: Get to the point where testing can be done before actually writing the code.
+5. Code the Implementation: Here, the code and the code that tests the code is written together, to ensure that the written code, passes the tests, that ensures that the unit of code written, is already tested, during the implementation of the code itself.
+
+[⬆️](#table-of-contents)
+
