@@ -41,6 +41,11 @@
       - [Why Build Service Abstractions?](#why-build-service-abstractions)
       - [Typical Steps to Build Services](#typical-steps-to-build-services)
     - [Develop Service Object Using Spring](#develop-service-object-using-spring)
+  - [Web Pages w/ Spring](#web-pages-w-spring)
+    - [Introduction to Controllers](#introduction-to-controllers)
+      - [Model View Controller (MVC)](#model-view-controller-mvc)
+        - [Spring Controller](#spring-controller)
+        - [Template Engines](#template-engines)
 
 ## Setting Up PostgreSQL using Docker
 
@@ -832,5 +837,69 @@ In this section, we'll take a look into:
 ### Develop Service Object Using Spring
 
 Please check the following commit for more information on this: [`98a5a33` &mdash; `RoomReservationService`](https://github.com/Ch-sriram/spring-framework/commit/98a5a338ebae5fbd5a0f82adcc6895f77b534692)
+
+[⬆️](#table-of-contents)
+
+## Web Pages w/ Spring
+
+We'll learn about the following topics:
+
+1. Controllers, &
+2. Rendering Engine &mdash; `Thymeleaf`
+
+[⬆️](#table-of-contents)
+
+### Introduction to Controllers
+
+- The controller is the most central part of the web application strategy with Spring. It's ultimately responsible for responding to web requests, assembling the payload for the response, and then delivering it.
+- For web pages, Spring levels the Model-View-Controller (MVC) Pattern.
+
+[⬆️](#table-of-contents)
+
+#### Model View Controller (MVC)
+
+- Fundamental pattern for web app development
+- Model is the data
+- View is the visual display that is populated
+- Controller wires the view with the model
+
+```txt
+                ┌─────────────┐
+                │    Client   │
+                └──────┬──────┘
+                       │ Request
+                       ▼
+                ┌─────────────┐
+                │ Controller  │
+                └──────┬──────┘
+                       │ updates/queries/renders
+          ┌────────────┴──────────────────┐
+          ▼                               ▼
+   ┌─────────────┐           ┌───────────────────────────┐
+   │    Model    │──────────▶│           View            │
+   │(Business +  │  provide  │       (UI Template)       │
+   │    Data)    │   data    │ [Render Engine: Thymleaf] │
+   └─────────────┘           └───────────────────────────┘
+```
+
+[⬆️](#table-of-contents)
+
+##### Spring Controller
+
+- Spring Bean &mdash; It's a Spring Bean, which is component scanned, as it's annotated by `@Comntroller` or a stereotype of itself, of `@Component`.
+- Annotated for the servlet mapping &mdash; URL that responds to the Request Mapping. This can either be class level or method level. Any method level annotation will append the class level annotation [if the class level annotation exists].
+- Responds to all incoming web requests &mdash; All configured request mappings will have a response, for all incoming requests.
+- Outputs a view or raw data &mdash; Depending on the use-case, the response will be a render of a view [via a templating engine], or raw data [json, xml, protobuf].
+
+[⬆️](#table-of-contents)
+
+##### Template Engines
+
+- Spring supports several templating engines.
+- Most popular one is `Thymeleaf`:
+  - Provides DSL for HTML, leaving raw HTML documents that can be visualized without data.
+  - Provides placeholders for dynamic data that's replaced with the data itself during rendering.
+  - The engine allows for final product.
+- All templating engines in Spring, are Optional &mdash; For frontend, the application can be completely built without any server side rendering, and therefore, technologies like `React`, `Angular`, or `Vue` can be used, to build the view of a fullstack application.
 
 [⬆️](#table-of-contents)
