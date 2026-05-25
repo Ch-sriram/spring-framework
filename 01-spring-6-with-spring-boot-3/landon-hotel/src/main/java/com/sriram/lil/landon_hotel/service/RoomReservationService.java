@@ -18,6 +18,10 @@ import com.sriram.lil.landon_hotel.service.model.RoomReservation;
 
 import io.micrometer.common.util.StringUtils;
 
+// @Service is a stereotype of spring that allows 
+// component scanning in Spring Boot, which in-turn
+// makes this an actual service object that can
+// be injected anywhere.
 @Service
 public class RoomReservationService {
 	
