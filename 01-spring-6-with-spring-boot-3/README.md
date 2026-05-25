@@ -46,6 +46,7 @@
       - [Model View Controller (MVC)](#model-view-controller-mvc)
         - [Spring Controller](#spring-controller)
         - [Template Engines](#template-engines)
+    - [Building Controller Using Spring](#building-controller-using-spring)
 
 ## Setting Up PostgreSQL using Docker
 
@@ -901,5 +902,11 @@ We'll learn about the following topics:
   - Provides placeholders for dynamic data that's replaced with the data itself during rendering.
   - The engine allows for final product.
 - All templating engines in Spring, are Optional &mdash; For frontend, the application can be completely built without any server side rendering, and therefore, technologies like `React`, `Angular`, or `Vue` can be used, to build the view of a fullstack application.
+
+[⬆️](#table-of-contents)
+
+### Building Controller Using Spring
+
+- Check the following commit details (commit message [important] + code): [`b4a9ea0` &mdash; focus on `WelcomeController` (Deleted `CLRunner` class)](https://github.com/Ch-sriram/spring-framework/commit/b4a9ea0f5bd9b5b199103caf45711451ee9f1dbf)
 
 [⬆️](#table-of-contents)
